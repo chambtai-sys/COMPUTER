@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COMPUTER | Command & Report HUD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-blue: #00d2ff;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: #050505;
+            color: #e2e8f0;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(0, 243, 255, 0.03) 0%, transparent 50%),
+                linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glow-cyan {
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+        }
+
+        .text-glow {
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-blue));
+            transition: width 1s ease-in-out;
+        }
+
+        .scanline {
+            width: 100%;
+            height: 2px;
+            background: rgba(0, 243, 255, 0.1);
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            animation: scan 4s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+    </style>
+</head>
+<body class="min-h-screen p-6 md:p-12 flex flex-col items-center">
+
+    <div class="max-w-7xl w-full flex flex-col gap-8">
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div>
+                <div class="flex items-center gap-4 mb-2">
+                    <div class="w-12 h-12 bg-cyan-600 rounded-xl flex items-center justify-center shadow-lg shadow-cyan-900/20 glow-cyan">
+                        <i data-lucide="cpu" class="text-white"></i>
+                    </div>
+                    <h1 class="text-5xl font-black tracking-tighter italic text-glow">COMPUTER</h1>
+                </div>
+                <p class="text-zinc-500 font-bold uppercase tracking-[0.4em] text-[10px] ml-1">Command & Report Central // PROTOTYPE v2.6</p>
+            </div>
+            
+            <div class="flex gap-4">
+                <div class="glass px-6 py-4 rounded-2xl flex flex-col min-w-[150px]">
+                    <span class="text-[10px] uppercase font-bold text-zinc-500 tracking-wider mb-1">CPU Load</span>
+                    <span id="cpu-val" class="text-2xl font-black text-glow">--%</span>
+                </div>
+                <div class="glass px-6 py-4 rounded-2xl flex flex-col min-w-[150px]">
+                    <span class="text-[10px] uppercase font-bold text-zinc-500 tracking-wider mb-1">RAM Cache</span>
+                    <span id="ram-val" class="text-2xl font-black">--%</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Grid -->
+        <main class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Pillar 1 & 3: Ops & Tech -->
+            <section class="lg:col-span-4 space-y-6">
+                <!-- Operations -->
+                <div class="glass p-8 rounded-[32px] relative overflow-hidden">
+                    <div class="scanline"></div>
+                    <h2 class="text-xs font-black uppercase text-cyan-400 mb-6 flex items-center gap-2 tracking-widest">
+                        <i data-lucide="terminal" size="14"></i> Commanding Operations
+                    </h2>
+                    
+                    <div id="ops-list" class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-zinc-500 text-sm">OS Kernel</span>
+                            <span id="os-val" class="text-sm font-bold">--</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-zinc-500 text-sm">System Uptime</span>
+                            <span id="uptime-val" class="text-sm font-bold">--</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-8">
+                        <button onclick="generateReport()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-black py-4 rounded-2xl font-black italic uppercase tracking-tighter transition-all shadow-xl shadow-cyan-900/10">
+                            GENERATE MASTER REPORT
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tech Endeavors -->
+                <div class="glass p-8 rounded-[32px]">
+                    <h2 class="text-xs font-black uppercase text-zinc-400 mb-6 flex items-center gap-2 tracking-widest">
+                        <i data-lucide="microscope" size="14"></i> Technological Endeavors
+                    </h2>
+                    
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="bg-zinc-900/50 p-4 rounded-2xl border border-zinc-800">
+                            <span class="block text-[10px] text-zinc-600 font-bold uppercase mb-1">Total Files</span>
+                            <span id="file-count" class="text-xl font-bold">--</span>
+                        </div>
+                        <div class="bg-zinc-900/50 p-4 rounded-2xl border border-zinc-800">
+                            <span class="block text-[10px] text-zinc-600 font-bold uppercase mb-1">Storage</span>
+                            <span id="storage-val" class="text-xl font-bold">-- MB</span>
+                        </div>
+                    </div>
+
+                    <div id="ext-distribution" class="space-y-3 max-h-48 overflow-y-auto pr-2">
+                        <!-- Extensions injected here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Pillar 2: Making Progress -->
+            <section class="lg:col-span-8">
+                <div class="glass p-10 rounded-[40px] h-full">
+                    <div class="flex items-center justify-between mb-10">
+                        <div>
+                            <h2 class="text-xs font-black uppercase text-indigo-400 mb-2 flex items-center gap-2 tracking-widest">
+                                <i data-lucide="trending-up" size="14"></i> Making Progress
+                            </h2>
+                            <p class="text-zinc-500 text-sm">Live tracking of active workspace milestones.</p>
+                        </div>
+                        <div class="text-right">
+                            <span id="progress-percent" class="text-5xl font-black italic tracking-tighter text-glow">--%</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-bar mb-12">
+                        <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+                    </div>
+
+                    <div id="tasks-list" class="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-y-auto max-h-[400px] pr-4">
+                        <!-- Tasks injected here -->
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Pillar 4: Reporting Modal -->
+        <div id="report-modal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-xl z-[100] p-12 flex items-center justify-center">
+            <div class="max-w-3xl w-full glass p-10 rounded-[40px] relative max-h-[80vh] overflow-y-auto">
+                <button onclick="closeReport()" class="absolute top-8 right-8 text-zinc-500 hover:text-white">
+                    <i data-lucide="x-circle" size="24"></i>
+                </button>
+                <div id="report-content" class="prose prose-invert prose-cyan max-w-none">
+                    <!-- Markdown Report Rendered Here -->
+                </div>
+            </div>
+        </div>
+
+        <footer class="text-center text-[10px] text-zinc-600 font-bold uppercase tracking-[0.5em] mt-8">
+            Command // Progress // Technology // Report
+        </footer>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        async function updateStats() {
+            try {
+                const res = await fetch('/api/stats');
+                const data = await res.json();
+
+                document.getElementById('cpu-val').innerText = `${data.ops.cpu_usage}%`;
+                document.getElementById('ram-val').innerText = `${data.ops.ram_usage}%`;
+                document.getElementById('os-val').innerText = `${data.ops.system} ${data.ops.release}`;
+                document.getElementById('uptime-val').innerText = data.ops.uptime;
+
+                document.getElementById('progress-percent').innerText = `${data.progress.percent}%`;
+                document.getElementById('progress-fill').style.width = `${data.progress.percent}%`;
+
+                const tasksList = document.getElementById('tasks-list');
+                tasksList.innerHTML = data.progress.tasks.map(t => `
+                    <div class="bg-zinc-900/30 p-4 rounded-2xl border border-white/5 flex items-center gap-4">
+                        <div class="w-6 h-6 rounded-full flex items-center justify-center ${t.done ? 'bg-cyan-500/20 text-cyan-400' : 'bg-zinc-800 text-zinc-600'}">
+                            <i data-lucide="${t.done ? 'check-circle-2' : 'circle'}" size="16"></i>
+                        </div>
+                        <span class="text-sm ${t.done ? 'line-through text-zinc-600' : 'text-zinc-300'}">${t.task}</span>
+                    </div>
+                `).join('');
+
+                document.getElementById('file-count').innerText = data.tech.file_count;
+                document.getElementById('storage-val').innerText = data.tech.total_size_mb;
+
+                const extList = document.getElementById('ext-distribution');
+                extList.innerHTML = Object.entries(data.tech.extensions).sort((a,b) => b[1]-a[1]).map(([ext, count]) => `
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-zinc-500 font-mono">${ext}</span>
+                        <div class="flex-1 mx-4 h-[1px] bg-zinc-800"></div>
+                        <span class="font-bold text-zinc-300">${count}</span>
+                    </div>
+                `).join('');
+
+                lucide.createIcons();
+            } catch (e) {}
+        }
+
+        async function generateReport() {
+            const res = await fetch('/api/report');
+            const data = await res.json();
+            const html = data.markdown
+                .replace(/^# (.*$)/gim, '<h1 class="text-3xl font-black mb-4">$1</h1>')
+                .replace(/^## (.*$)/gim, '<h2 class="text-xl font-bold mt-8 mb-2 text-cyan-400">$1</h2>')
+                .replace(/^- (.*$)/gim, '<li class="text-zinc-400 ml-4">$1</li>');
+            document.getElementById('report-content').innerHTML = html;
+            document.getElementById('report-modal').classList.remove('hidden');
+        }
+
+        function closeReport() {
+            document.getElementById('report-modal').classList.add('hidden');
+        }
+
+        setInterval(updateStats, 2000);
+        updateStats();
+    </script>
+</body>
+</html>
